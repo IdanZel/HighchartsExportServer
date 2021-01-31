@@ -7,9 +7,9 @@ using Svg;
 
 namespace HighchartsExportServer
 {
-    public static class ImageConversion
+    public interface ISvgToPngConverter
     {
-        public static async Task<byte[]> SvgToPng(int width, string svg)
+        async Task<byte[]> ConvertAsync(int width, string svg)
         {
             var xml = new XmlDocument();
             xml.LoadXml(svg);

@@ -9,11 +9,13 @@ namespace HighchartsExportServer
     {
         private const string PNG_CONTENT_TYPE = "image/png";
 
-        private static ILogger<ChartsController> _logger;
-        
-        public ChartsController(ILogger<ChartsController> logger)
+        private readonly ILogger<ChartsController> _logger;
+        private readonly ISvgToPngConverter _svgToPngConverter;
+
+        public ChartsController(ILogger<ChartsController> logger, ISvgToPngConverter svgToPngConverter)
         {
-            _logger ??= logger;
+            _logger = logger;
+            _svgToPngConverter = svgToPngConverter;
         }
         
         [HttpPost]
@@ -49,7 +51,7 @@ namespace HighchartsExportServer
             
             try
             {
-                pngBytes = await ImageConversion.SvgToPng(width, svg);
+                pngBytes = await _svgToPngConverter.ConvertAsync(width, svg);
             }
             catch (Exception e)
             {
