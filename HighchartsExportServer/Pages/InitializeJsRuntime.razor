@@ -1,0 +1,12 @@
+﻿@page "/InitializeJsRuntime"
+@inject IJSRuntime JsRuntime
+
+@code {
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        JsRuntimeProxy.SetJsRuntime(JsRuntime);
+    }
+
+}

@@ -1,0 +1,32 @@
+﻿@page "/"
+@namespace HighchartsExportServer.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>_</title>
+</head>
+<body>
+    <app>
+        <component type="typeof(App)" render-mode="ServerPrerendered" />
+    </app>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/offline-exporting.js"></script>
+    <script>        
+        window.exportChart = (data) => {            
+            try {
+                return Highcharts.chart(document.createElement('chart'), JSON.parse(data)).getSVG();
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+    </script>
+</body>
+</html>
