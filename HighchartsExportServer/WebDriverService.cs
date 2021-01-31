@@ -12,12 +12,12 @@ namespace HighchartsExportServer
         private const string CHROME_HEADLESS_ARGUMENT = "--headless";
         private const string INITIALIZE_JS_RUNTIME_ROUTE = "InitializeJsRuntime";
 
-        private static ILogger<WebDriverService> _logger;
-        private static IWebDriver _webDriver;
+        private readonly ILogger<WebDriverService> _logger;
+        private IWebDriver _webDriver;
         
         public WebDriverService(ILogger<WebDriverService> logger)
         {
-            _logger ??= logger;
+            _logger = logger;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
