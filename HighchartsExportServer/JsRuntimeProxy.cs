@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
 
@@ -15,12 +16,16 @@ namespace HighchartsExportServer
 
         public static async Task<T> InvokeJsFunctionAsync<T>(string function, params object[] parameters)
         {
+            int timeout = Configuration.JsFunctionTimeout;
+
+            CancellationToken cancellationToken = new CancellationTokenSource(timeout).Token;
+            
             while (_jsRuntime == null)
             {
-                await Task.Delay(Configuration.JsRuntimeValidationInterval);
+                await Task.Delay(Configuration.JsRuntimeValidationInterval, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
             }
 
-            int timeout = Configuration.JsFunctionTimeout;
             return await _jsRuntime.InvokeAsync<T>(function, TimeSpan.FromMilliseconds(timeout), parameters);
         }
     }
