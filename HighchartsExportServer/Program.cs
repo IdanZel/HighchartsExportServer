@@ -15,6 +15,7 @@ namespace HighchartsExportServer
             await Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(builder => builder.UseStartup<Startup>())
                 .ConfigureServices(services => services
+                    .AddSingleton<IChromeDriverDownloader, LatestChromeDriverDownloader>()
                     .AddHostedService<WebDriverService>()
                     .AddSignalR(options => options.MaximumReceiveMessageSize = null))
                 .ConfigureLogging(builder =>

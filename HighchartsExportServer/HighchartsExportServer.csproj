@@ -31,10 +31,4 @@
     <PackageReference Include="Svg" Version="3.2.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="chromedriver.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
