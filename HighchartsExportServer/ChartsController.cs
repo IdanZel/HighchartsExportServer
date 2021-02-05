@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace HighchartsExportServer
@@ -11,11 +12,20 @@ namespace HighchartsExportServer
 
         private readonly ILogger<ChartsController> _logger;
         private readonly ISvgToPngConverter _svgToPngConverter;
+        private readonly int _jsFunctionTimeout;
+        private readonly int _jsRuntimeValidationInterval;
 
-        public ChartsController(ILogger<ChartsController> logger, ISvgToPngConverter svgToPngConverter)
+        public ChartsController(ILogger<ChartsController> logger, ISvgToPngConverter svgToPngConverter,
+            IConfiguration configuration)
         {
             _logger = logger;
             _svgToPngConverter = svgToPngConverter;
+            
+            _jsFunctionTimeout = configuration[Configuration.JsFunctionTimeout.Key]
+                .ParseIntOrDefault(Configuration.JsFunctionTimeout.Default);
+            
+            _jsRuntimeValidationInterval = configuration[Configuration.JsRuntimeValidationInterval.Key]
+                .ParseIntOrDefault(Configuration.JsRuntimeValidationInterval.Default);
         }
         
         [HttpPost]
@@ -29,7 +39,8 @@ namespace HighchartsExportServer
 
             try
             {
-                svg = await JsRuntimeProxy.InvokeJsFunctionAsync<string>("exportChart", data.ToString());
+                svg = await JsRuntimeProxy.InvokeJsFunctionAsync<string>("exportChart", _jsFunctionTimeout,
+                    _jsRuntimeValidationInterval, data.ToString());
             }
             catch (TaskCanceledException e)
             {

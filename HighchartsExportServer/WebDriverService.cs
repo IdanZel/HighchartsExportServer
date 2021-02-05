@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
@@ -15,12 +16,16 @@ namespace HighchartsExportServer
 
         private readonly ILogger<WebDriverService> _logger;
         private readonly IChromeDriverDownloader _chromeDriverDownloader;
+        private readonly string _hostUrl;
+        
         private IWebDriver _webDriver;
 
-        public WebDriverService(ILogger<WebDriverService> logger, IChromeDriverDownloader chromeDriverDownloader)
+        public WebDriverService(ILogger<WebDriverService> logger, IChromeDriverDownloader chromeDriverDownloader,
+            IConfiguration configuration)
         {
             _logger = logger;
             _chromeDriverDownloader = chromeDriverDownloader;
+            _hostUrl = configuration[Configuration.HostUrl.Key]?.ParseUrl() ?? Configuration.HostUrl.Default;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -39,7 +44,7 @@ namespace HighchartsExportServer
 
             _logger.LogInformation("Requesting InitializeJsRuntime.");
 
-            _webDriver.Navigate().GoToUrl(Configuration.HostUrl + INITIALIZE_JS_RUNTIME_ROUTE);
+            _webDriver.Navigate().GoToUrl(_hostUrl + INITIALIZE_JS_RUNTIME_ROUTE);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

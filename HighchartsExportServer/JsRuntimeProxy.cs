@@ -14,19 +14,18 @@ namespace HighchartsExportServer
             _jsRuntime = jsRuntime;
         }
 
-        public static async Task<T> InvokeJsFunctionAsync<T>(string function, params object[] parameters)
+        public static async Task<T> InvokeJsFunctionAsync<T>(string function, int jsFunctionTimeout, 
+            int jsRuntimeValidationInterval, params object[] parameters)
         {
-            int timeout = Configuration.JsFunctionTimeout;
-
-            CancellationToken cancellationToken = new CancellationTokenSource(timeout).Token;
+            CancellationToken cancellationToken = new CancellationTokenSource(jsFunctionTimeout).Token;
             
             while (_jsRuntime == null)
             {
-                await Task.Delay(Configuration.JsRuntimeValidationInterval, cancellationToken);
+                await Task.Delay(jsRuntimeValidationInterval, cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            return await _jsRuntime.InvokeAsync<T>(function, TimeSpan.FromMilliseconds(timeout), parameters);
+            return await _jsRuntime.InvokeAsync<T>(function, TimeSpan.FromMilliseconds(jsFunctionTimeout), parameters);
         }
     }
 }

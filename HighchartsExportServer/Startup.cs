@@ -23,8 +23,6 @@ namespace HighchartsExportServer
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Configuration.Initialize(_configuration);
-            
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace HighchartsExportServer
 {
@@ -17,16 +18,13 @@ namespace HighchartsExportServer
         private const string OUTPUT_FILENAME = "chromedriver.exe";
 
         private readonly HttpClient _httpClient;
-        private readonly string _windowsVersionIndicator;
+        private readonly string _platformIndicator;
 
-        public LatestChromeDriverDownloader(string windowsVersionIndicator)
+        public LatestChromeDriverDownloader(IConfiguration configuration)
         {
             _httpClient = new HttpClient();
-            _windowsVersionIndicator = windowsVersionIndicator;
-        }
-
-        public LatestChromeDriverDownloader() : this("win32")
-        {
+            _platformIndicator = configuration[Configuration.PlatformIndicator.Key] ??
+                                 Configuration.PlatformIndicator.Default;
         }
 
         public async Task<string> DownloadAsync()
@@ -56,7 +54,7 @@ namespace HighchartsExportServer
                 .Elements($"{{{xmlNamespace}}}{CONTENTS_ELEMENT_NAME}")
                 .Select(e => e.Element($"{{{xmlNamespace}}}{KEY_ELEMENT_NAME}")!.Value)
                 .Where(s => s.Contains(latestChromeDriverKey, StringComparison.OrdinalIgnoreCase))
-                .SingleOrDefault(s => s.Contains(_windowsVersionIndicator, StringComparison.OrdinalIgnoreCase));
+                .SingleOrDefault(s => s.Contains(_platformIndicator, StringComparison.OrdinalIgnoreCase));
 
             return CHROME_DRIVER_STORAGE_URL + latestChromeDriverRoute;
         }
