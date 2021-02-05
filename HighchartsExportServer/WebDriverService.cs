@@ -27,13 +27,15 @@ namespace HighchartsExportServer
         {
             _logger.LogInformation("Downloading latest chrome driver.");
             
-            await _chromeDriverDownloader.DownloadAsync();
+            string chromeDriverDirectory = await _chromeDriverDownloader.DownloadAsync();
             
             _logger.LogInformation("Initializing Selenium Chrome web driver (headless).");
 
             var chromeOptions = new ChromeOptions();
             chromeOptions.AddArgument(CHROME_HEADLESS_ARGUMENT);
-            _webDriver = new ChromeDriver(ChromeDriverService.CreateDefaultService(Configuration.ChromeDriverDirectory), chromeOptions);
+            
+            var chromeDriverService = ChromeDriverService.CreateDefaultService(chromeDriverDirectory);
+            _webDriver = new ChromeDriver(chromeDriverService, chromeOptions);
 
             _logger.LogInformation("Requesting InitializeJsRuntime.");
 

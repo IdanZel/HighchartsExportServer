@@ -29,7 +29,7 @@ namespace HighchartsExportServer
         {
         }
 
-        public async Task DownloadAsync()
+        public async Task<string> DownloadAsync()
         {
             Task<string> latestChromeDriverKeyTask = _httpClient.GetStringAsync(LATEST_VERSION_KEY_URL);
             Task<XDocument> chromeDriverStorageTask = GetChromeDriverStorage();
@@ -37,7 +37,7 @@ namespace HighchartsExportServer
             string latestChromeDriverUrl =
                 GetLatestChromeDriverUrl(await chromeDriverStorageTask, await latestChromeDriverKeyTask);
 
-            await DownloadLatestChromeDriver(latestChromeDriverUrl);
+            return await DownloadLatestChromeDriver(latestChromeDriverUrl);
         }
 
         public void Dispose() => _httpClient.Dispose();
@@ -61,13 +61,16 @@ namespace HighchartsExportServer
             return CHROME_DRIVER_STORAGE_URL + latestChromeDriverRoute;
         }
 
-        private async Task DownloadLatestChromeDriver(string latestChromeDriverUrl)
+        private async Task<string> DownloadLatestChromeDriver(string latestChromeDriverUrl)
         {
             await using Stream httpContentStream = await _httpClient.GetStreamAsync(latestChromeDriverUrl);
             using var chromeDriverZipArchive = new ZipArchive(httpContentStream, ZipArchiveMode.Read);
-            
-            string outputPath = Path.Combine(Configuration.ChromeDriverDirectory, OUTPUT_FILENAME);
+
+            string outputDirectory = Path.GetTempPath();
+            string outputPath = Path.Combine(outputDirectory, OUTPUT_FILENAME);
             chromeDriverZipArchive.Entries.First().ExtractToFile(outputPath, true);
+
+            return outputDirectory;
         }
     }
 }

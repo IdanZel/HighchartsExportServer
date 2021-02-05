@@ -5,6 +5,6 @@ namespace HighchartsExportServer
 {
     public interface IChromeDriverDownloader : IDisposable
     {
-        Task DownloadAsync();
+        Task<string> DownloadAsync();
     }
 }
